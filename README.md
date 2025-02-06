@@ -5,7 +5,7 @@ uint128
 [![Go Report Card](http://goreportcard.com/badge/github.com/lukechampine/uint128)](https://goreportcard.com/report/github.com/lukechampine/uint128)
 
 ```
-go get lukechampine.com/uint128
+go get github.com/vlmoon99/uint128
 ```
 
 `uint128` provides a high-performance `Uint128` type that supports standard arithmetic
