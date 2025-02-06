@@ -397,29 +397,6 @@ func (u Uint128) AppendBytesBE(b []byte) []byte {
 	return b
 }
 
-// Big returns u as a *big.Int.
-func (u Uint128) Big() *big.Int {
-	i := new(big.Int).SetUint64(u.Hi)
-	i = i.Lsh(i, 64)
-	i = i.Xor(i, new(big.Int).SetUint64(u.Lo))
-	return i
-}
-
-// Scan implements fmt.Scanner.
-func (u *Uint128) Scan(s fmt.ScanState, ch rune) error {
-	i := new(big.Int)
-	if err := i.Scan(s, ch); err != nil {
-		return err
-	} else if i.Sign() < 0 {
-		return errors.New("value cannot be negative")
-	} else if i.BitLen() > 128 {
-		return errors.New("value overflows Uint128")
-	}
-	u.Lo = i.Uint64()
-	u.Hi = i.Rsh(i, 64).Uint64()
-	return nil
-}
-
 // New returns the Uint128 value (lo,hi).
 func New(lo, hi uint64) Uint128 {
 	return Uint128{lo, hi}
@@ -446,32 +423,55 @@ func FromBytesBE(b []byte) Uint128 {
 	)
 }
 
-// FromBig converts i to a Uint128 value. It panics if i is negative or
-// overflows 128 bits.
-func FromBig(i *big.Int) (u Uint128) {
-	if i.Sign() < 0 {
-		panic("value cannot be negative")
-	} else if i.BitLen() > 128 {
-		panic("value overflows Uint128")
-	}
-	u.Lo = i.Uint64()
-	u.Hi = i.Rsh(i, 64).Uint64()
-	return u
-}
-
 // FromString parses s as a Uint128 value.
 func FromString(s string) (u Uint128, err error) {
 	_, err = fmt.Sscan(s, &u)
 	return
 }
 
-// MarshalText implements encoding.TextMarshaler.
-func (u Uint128) MarshalText() ([]byte, error) {
-	return []byte(u.String()), nil
+// Scan implements fmt.Scanner.
+func (u *Uint128) Scan(s fmt.ScanState, ch rune) error {
+	i := new(big.Int)
+	if err := i.Scan(s, ch); err != nil {
+		return err
+	} else if i.Sign() < 0 {
+		return errors.New("value cannot be negative")
+	} else if i.BitLen() > 128 {
+		return errors.New("value overflows Uint128")
+	}
+	u.Lo = i.Uint64()
+	u.Hi = i.Rsh(i, 64).Uint64()
+	return nil
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (u *Uint128) UnmarshalText(b []byte) error {
-	_, err := fmt.Sscan(string(b), u)
-	return err
-}
+// // Big returns u as a *big.Int.
+// func (u Uint128) Big() *big.Int {
+// 	i := new(big.Int).SetUint64(u.Hi)
+// 	i = i.Lsh(i, 64)
+// 	i = i.Xor(i, new(big.Int).SetUint64(u.Lo))
+// 	return i
+// }
+
+// // FromBig converts i to a Uint128 value. It panics if i is negative or
+// // overflows 128 bits.
+// func FromBig(i *big.Int) (u Uint128) {
+// 	if i.Sign() < 0 {
+// 		panic("value cannot be negative")
+// 	} else if i.BitLen() > 128 {
+// 		panic("value overflows Uint128")
+// 	}
+// 	u.Lo = i.Uint64()
+// 	u.Hi = i.Rsh(i, 64).Uint64()
+// 	return u
+// }
+
+// // MarshalText implements encoding.TextMarshaler.
+// func (u Uint128) MarshalText() ([]byte, error) {
+// 	return []byte(u.String()), nil
+// }
+
+// // UnmarshalText implements encoding.TextUnmarshaler.
+// func (u *Uint128) UnmarshalText(b []byte) error {
+// 	_, err := fmt.Sscan(string(b), u)
+// 	return err
+// }
